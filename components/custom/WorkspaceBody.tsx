@@ -7,6 +7,7 @@ import { Card, CardContent } from "../ui/card";
 import EmptyWorkspace from "./EmptyWorkspace";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import RepoDialog from "./RepoDialog";
 
 function WorkspaceBody() {
   const { userDetail } = useContext(UserDetailContext);
@@ -49,7 +50,9 @@ function WorkspaceBody() {
           {!token ? (
             <Button onClick={OnAddRepo}>Thiết lập</Button>
           ) : (
-            <Button>+ Thêm Repo</Button>
+            <RepoDialog
+              setRefreshPage={(refresh: boolean) => console.log(refresh)}
+            />
           )}
         </div>
       </Card>
