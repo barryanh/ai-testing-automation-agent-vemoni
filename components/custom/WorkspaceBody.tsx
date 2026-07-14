@@ -7,16 +7,36 @@ import { Card, CardContent } from "../ui/card";
 import EmptyWorkspace from "./EmptyWorkspace";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import RepoDialog from "./RepoDialog";
+import RepoDialog, { Repo } from "./RepoDialog";
+import UserRepoList from "./UserRepoList";
+
+export type UserRepo = {
+  id: number;
+  repoId: number;
+  name: string;
+  fullName: string;
+  private: boolean;
+  htmlUrl: string;
+  description: string;
+  userId: number;
+  owner: string;
+  updatedAt: string;
+  language: string;
+  defaultBranch: string;
+};
 
 function WorkspaceBody() {
   const { userDetail } = useContext(UserDetailContext);
   const router = useRouter();
   const [token, setToken] = useState("");
-
+  const [userRepoList, setUserRepoList] = useState<UserRepo[]>([]);
   useEffect(() => {
     GetGithubUserToken();
   }, []);
+
+  useEffect(() => {
+    userDetail && GetUserAddedRepoList();
+  }, [userDetail]);
 
   const GetGithubUserToken = async () => {
     const result = await axios.get("/api/github/token");
@@ -26,6 +46,12 @@ function WorkspaceBody() {
 
   const OnAddRepo = async () => {
     router.push("/api/github");
+  };
+
+  const GetUserAddedRepoList = async () => {
+    const result = await axios.get("/api/user-repo?userId=" + userDetail?.id);
+    console.log(result.data);
+    setUserRepoList(result.data);
   };
 
   return (
@@ -51,17 +77,21 @@ function WorkspaceBody() {
             <Button onClick={OnAddRepo}>Thiết lập</Button>
           ) : (
             <RepoDialog
-              setRefreshPage={(refresh: boolean) => console.log(refresh)}
+              setRefreshPage={(refresh: boolean) => GetUserAddedRepoList()}
             />
           )}
         </div>
       </Card>
 
-      <Card className="mt-10">
-        <CardContent>
-          <EmptyWorkspace />
-        </CardContent>
-      </Card>
+      {!userRepoList ? (
+        <Card className="mt-10">
+          <CardContent>
+            <EmptyWorkspace />
+          </CardContent>
+        </Card>
+      ) : (
+        <UserRepoList repoList={userRepoList} />
+      )}
     </div>
   );
 }
