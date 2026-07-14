@@ -18,6 +18,8 @@ export const repositories = pgTable("repositories", {
   private: integer("private").notNull(),
   htmlUrl: text("html_url").notNull(),
   description: text("description"),
+  defaultBranch: text("default_branch"),
+  language: text("language"),
   owner: text("owner").notNull(),
 });
 
